@@ -1,14 +1,16 @@
-type HangmanWordProps = {
-  guessedLetters: string[]
-  wordToGuess: string
-  reveal?: boolean
-}
+import { useRootState, useSelected } from "@watchable/store-react";
+import { GameProps, isLoser } from "./state";
 
-export function HangmanWord({
-  guessedLetters,
-  wordToGuess,
-  reveal = false,
-}: HangmanWordProps) {
+type HangmanWordProps = {
+  guessedLetters: string[];
+  wordToGuess: string;
+  reveal?: boolean;
+};
+
+export function HangmanWord(props: GameProps) {
+  const state = useRootState(props.gameStore);
+  const { guessedLetters, wordToGuess } = state;
+  const loser = isLoser(state);
   return (
     <div
       style={{
@@ -25,11 +27,9 @@ export function HangmanWord({
           <span
             style={{
               visibility:
-                guessedLetters.includes(letter) || reveal
-                  ? "visible"
-                  : "hidden",
+                guessedLetters.includes(letter) || loser ? "visible" : "hidden",
               color:
-                !guessedLetters.includes(letter) && reveal ? "red" : "black",
+                !guessedLetters.includes(letter) && loser ? "red" : "black",
             }}
           >
             {letter}
@@ -37,5 +37,5 @@ export function HangmanWord({
         </span>
       ))}
     </div>
-  )
+  );
 }

@@ -1,4 +1,13 @@
-import styles from "./Keyboard.module.css"
+import { useRootState } from "@watchable/store-react";
+import styles from "./Keyboard.module.css";
+import {
+  GameProps,
+  addGuessedLetter,
+  getActiveLetters,
+  getIncorrectLetters,
+  isLoser,
+  isWinner,
+} from "./state";
 
 const KEYS = [
   "a",
@@ -27,21 +36,14 @@ const KEYS = [
   "x",
   "y",
   "z",
-]
+];
 
-type KeyboardProps = {
-  disabled?: boolean
-  activeLetters: string[]
-  inactiveLetters: string[]
-  addGuessedLetter: (letter: string) => void
-}
+export function Keyboard(props: GameProps) {
+  const state = useRootState(props.gameStore);
+  const activeLetters = getActiveLetters(state);
+  const incorrectLetters = getIncorrectLetters(state);
+  const disabled = isWinner(state) || isLoser(state);
 
-export function Keyboard({
-  activeLetters,
-  inactiveLetters,
-  addGuessedLetter,
-  disabled = false,
-}: KeyboardProps) {
   return (
     <div
       style={{
@@ -50,12 +52,12 @@ export function Keyboard({
         gap: ".5rem",
       }}
     >
-      {KEYS.map(key => {
-        const isActive = activeLetters.includes(key)
-        const isInactive = inactiveLetters.includes(key)
+      {KEYS.map((key) => {
+        const isActive = activeLetters.includes(key);
+        const isInactive = incorrectLetters.includes(key);
         return (
           <button
-            onClick={() => addGuessedLetter(key)}
+            onClick={() => addGuessedLetter(props.gameStore, key)}
             className={`${styles.btn} ${isActive ? styles.active : ""} ${
               isInactive ? styles.inactive : ""
             }`}
@@ -64,8 +66,8 @@ export function Keyboard({
           >
             {key}
           </button>
-        )
+        );
       })}
     </div>
-  )
+  );
 }
